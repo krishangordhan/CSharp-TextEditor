@@ -15,8 +15,8 @@ Build a fully-featured, cross-platform (Windows + macOS) desktop text editor in 
 ### Phase 0 — Solution & Project Scaffold
 
 - [x] **Step 1**: Create the solution folder structure (`src/` and `tests/`). Scaffold all 8 projects using `dotnet new` — `classlib` for Domain, Application, Infrastructure; `avalonia.app` (or `classlib` initially) for Presentation; `xunit` for each of the 4 test projects. Register all 8 projects in `TextEditor.slnx`.
-- [ ] **Step 2**: Configure every `.csproj` with `<TargetFramework>net10.0</TargetFramework>`, `<Nullable>enable</Nullable>`, `<ImplicitUsings>enable</ImplicitUsings>`, and `<LangVersion>latest</LangVersion>`.
-- [ ] **Step 3**: Add Clean Architecture project references — Application → Domain; Infrastructure → Application + Domain; Presentation → Application. Add test project references to their corresponding source projects.
+- [x] **Step 2**: Configure every `.csproj` with `<TargetFramework>net10.0</TargetFramework>`, `<Nullable>enable</Nullable>`, `<ImplicitUsings>enable</ImplicitUsings>`, and `<LangVersion>latest</LangVersion>`.
+- [x] **Step 3**: Add Clean Architecture project references — Application → Domain; Infrastructure → Application + Domain; Presentation → Application. Add test project references to their corresponding source projects.
 - [ ] **Step 4**: Add NuGet packages — xUnit + Shouldly + Moq to all test projects; `Microsoft.Extensions.DependencyInjection` to Infrastructure and Presentation; `Serilog` (or `Microsoft.Extensions.Logging`) to Infrastructure.
 
 ### Phase 1 — Piece Table Core (Domain)
