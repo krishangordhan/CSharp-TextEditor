@@ -25,7 +25,7 @@ This project follows **Clean Architecture**. All dependencies point **inward** t
 ```
 ┌─────────────────────────────────────────┐
 │           Presentation Layer            │  TextEditor.Presentation
-│   (UI / WPF / Console / API)            │  → depends on Application only
+│   (UI — Avalonia UI desktop app)        │  → depends on Application only
 └────────────────┬────────────────────────┘
                  │
 ┌────────────────▼────────────────────────┐
@@ -317,6 +317,13 @@ Do not proceed until the user confirms.
 - Never use `ServiceLocator` or static service resolution inside business logic.
 - Use the correct **service lifetime**: `Singleton` for stateless/shared services, `Scoped` for per-request state, `Transient` for lightweight stateless services. Never capture a `Scoped` service inside a `Singleton`.
 
+### UI Framework
+
+- The Presentation layer uses **Avalonia UI** (v11+) to deliver a native cross-platform desktop application on Windows and macOS (and Linux).
+- Avalonia is the chosen framework because it is the closest production-ready equivalent to WPF that runs cross-platform, supports Skia-based custom rendering (essential for the text editor canvas), and allows the Presentation layer to be swapped without touching Application or Domain.
+- Do **not** reference `Avalonia.*` namespaces from Application, Infrastructure, or Domain — only `TextEditor.Presentation` may import Avalonia packages.
+- The target framework for all projects is `net10.0` (.NET 10).
+
 ### Solution Format
 
 - This repository uses the `.slnx` solution format. Do not convert it to `.sln`.
@@ -334,5 +341,5 @@ Do not proceed until the user confirms.
 
 ---
 
-_Last updated: 2026-04-09_
+_Last updated: 2026-04-09 — Added Avalonia UI framework decision; replaced WPF references._
 
