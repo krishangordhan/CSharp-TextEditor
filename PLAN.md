@@ -175,14 +175,6 @@ Build a fully-featured, cross-platform (Windows + macOS) desktop text editor in 
 
 ---
 
-## Completed
-
-Completed steps are moved here by the agent after each confirmed change.
-
-- [x] **Step 1** — Scaffolded 8 projects (`classlib` × 4, `xunit` × 4) into `src/` and `tests/`; all registered in `TextEditor.slnx` with correct solution folder grouping. Solution builds with 0 errors, 0 warnings.
-
----
-
 ## Notes / Decisions
 
 - **UI Framework**: Avalonia UI v11+ (cross-platform Windows + macOS + Linux, Skia-based rendering, WPF-like XAML). Only `TextEditor.Presentation` may reference Avalonia packages. Chosen over WPF (Windows-only) and MAUI (mobile-first); presentation layer is isolated so the framework can be swapped without touching Application or Domain.
