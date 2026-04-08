@@ -9,7 +9,7 @@
 Build a fully-featured, cross-platform (Windows + macOS) desktop text editor in C# using Clean Architecture, with Avalonia UI as the presentation layer and a Piece Table as the core text storage structure.
 
 ---
-
+ 
 ## Steps
 
 ### Phase 0 — Solution & Project Scaffold
