@@ -152,8 +152,55 @@ internal sealed class PieceTable
         _pieces.Insert(pieceIndex, leftPiece);
     }
 
-    private string GetBufferText(Piece piece) =>
+    internal string GetText()
+    {
+        if (_pieces.Count == 0)
+            return string.Empty;
+
+        var sb = new StringBuilder(Length);
+        foreach (var piece in _pieces)
+            sb.Append(GetBufferSlice(piece, 0, piece.Length));
+        return sb.ToString();
+    }
+
+    internal string GetRange(int offset, int length)
+    {
+        if (offset < 0 || offset > Length)
+            throw new ArgumentOutOfRangeException(nameof(offset), "Offset must be within [0, Length].");
+        if (length < 0)
+            throw new ArgumentOutOfRangeException(nameof(length), "Length must be non-negative.");
+        if (offset + length > Length)
+            throw new ArgumentOutOfRangeException(nameof(length), "Range exceeds document length.");
+        if (length == 0)
+            return string.Empty;
+
+        var rangeEnd = offset + length;
+        var accumulated = 0;
+        var sb = new StringBuilder(length);
+
+        foreach (var piece in _pieces)
+        {
+            var pieceStart = accumulated;
+            var pieceEnd = accumulated + piece.Length;
+            accumulated += piece.Length;
+
+            if (pieceEnd <= offset)
+                continue;
+
+            if (pieceStart >= rangeEnd)
+                break;
+
+            var clipStart = Math.Max(pieceStart, offset) - pieceStart;
+            var clipEnd = Math.Min(pieceEnd, rangeEnd) - pieceStart;
+
+            sb.Append(GetBufferSlice(piece, clipStart, clipEnd - clipStart));
+        }
+
+        return sb.ToString();
+    }
+
+    private string GetBufferSlice(Piece piece, int start, int length) =>
         piece.Buffer == BufferType.Original
-            ? _originalBuffer.Substring(piece.Start, piece.Length)
-            : _addBuffer.ToString(piece.Start, piece.Length);
+            ? _originalBuffer.Substring(piece.Start + start, length)
+            : _addBuffer.ToString(piece.Start + start, length);
 }
