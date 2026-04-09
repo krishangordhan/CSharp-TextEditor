@@ -83,5 +83,85 @@ public sealed class PieceTableTests
         // Assert
         act.ShouldThrow<ArgumentOutOfRangeException>();
     }
+
+    [Fact]
+    public void Delete_ZeroLength_DoesNotChangeLength()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        pieceTable.Delete(0, 0);
+
+        // Assert
+        pieceTable.Length.ShouldBe(5);
+    }
+
+
+    [Fact]
+    public void Delete_FromMiddle_DecreasesLength()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        pieceTable.Delete(1, 3);
+
+        // Assert
+        pieceTable.Length.ShouldBe(2);
+    }
+
+    [Fact]
+    public void Delete_AcrossMultiplePieces_DecreasesLength()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+        pieceTable.Insert(5, " World");
+
+        // Act
+        pieceTable.Delete(3, 5);
+
+        // Assert
+        pieceTable.Length.ShouldBe(6);
+    }
+
+    [Fact]
+    public void Delete_NegativeOffset_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        var act = () => pieceTable.Delete(-1, 1);
+
+        // Assert
+        act.ShouldThrow<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void Delete_NegativeLength_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        var act = () => pieceTable.Delete(0, -1);
+
+        // Assert
+        act.ShouldThrow<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void Delete_RangeExceedsDocumentLength_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        var act = () => pieceTable.Delete(3, 5);
+
+        // Assert
+        act.ShouldThrow<ArgumentOutOfRangeException>();
+    }
 }
 
