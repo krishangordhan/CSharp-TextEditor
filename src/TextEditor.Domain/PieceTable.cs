@@ -67,6 +67,77 @@ internal sealed class PieceTable
         }
     }
 
+    internal void Delete(int offset, int length)
+    {
+        if (offset < 0 || offset > Length)
+            throw new ArgumentOutOfRangeException(nameof(offset), "Offset must be within [0, Length].");
+        if (length < 0)
+            throw new ArgumentOutOfRangeException(nameof(length), "Length must be non-negative.");
+        if (offset + length > Length)
+            throw new ArgumentOutOfRangeException(nameof(length), "Delete range exceeds document length.");
+        if (length == 0)
+            return;
+
+        var deleteEnd = offset + length;
+        var accumulated = 0;
+        var i = 0;
+
+        while (i < _pieces.Count)
+        {
+            var piece = _pieces[i];
+            var pieceStart = accumulated;
+            var pieceEnd = accumulated + piece.Length;
+
+            if (pieceEnd <= offset)
+            {
+                accumulated += piece.Length;
+                i++;
+                continue;
+            }
+
+            if (pieceStart >= deleteEnd)
+                break;
+
+            if (pieceStart < offset && pieceEnd > deleteEnd)
+            {
+                SplitPieceForDeletion(i, pieceStart, offset, deleteEnd);
+                return;
+            }
+
+            if (pieceStart < offset)
+            {
+                _pieces[i] = piece with { Length = offset - pieceStart };
+                accumulated += piece.Length;
+                i++;
+            }
+            else if (pieceEnd > deleteEnd)
+            {
+                var trimAmount = deleteEnd - pieceStart;
+                _pieces[i] = piece with { Start = piece.Start + trimAmount, Length = piece.Length - trimAmount };
+                break;
+            }
+            else
+            {
+                _pieces.RemoveAt(i);
+                accumulated += piece.Length;
+            }
+        }
+    }
+
+    private void SplitPieceForDeletion(int pieceIndex, int pieceStart, int deleteStart, int deleteEnd)
+    {
+        var piece = _pieces[pieceIndex];
+        var leftLength = deleteStart - pieceStart;
+        var rightSkip = deleteEnd - pieceStart;
+
+        var leftPiece = piece with { Length = leftLength };
+        var rightPiece = piece with { Start = piece.Start + rightSkip, Length = piece.Length - rightSkip };
+
+        _pieces.RemoveAt(pieceIndex);
+        _pieces.Insert(pieceIndex, rightPiece);
+        _pieces.Insert(pieceIndex, leftPiece);
+    }
+
     private void SplitPieceAndInsert(int pieceIndex, int pieceStartOffset, int insertOffset, Piece newPiece)
     {
         var piece = _pieces[pieceIndex];
