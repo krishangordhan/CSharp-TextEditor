@@ -66,10 +66,10 @@ TextEditor.slnx
 │   ├── TextEditor.Infrastructure/
 │   └── TextEditor.Presentation/
 └── tests/
-    ├── TextEditor.Domain.Tests/
-    ├── TextEditor.Application.Tests/
-    ├── TextEditor.Infrastructure.Tests/
-    └── TextEditor.Presentation.Tests/
+    ├── TextEditor.Domain.UnitTests/
+    ├── TextEditor.Application.UnitTests/
+    ├── TextEditor.Infrastructure.UnitTests/
+    └── TextEditor.Presentation.UnitTests/
 ```
 
 ---
@@ -168,6 +168,11 @@ Examples:
 - `InsertText_AtValidPosition_UpdatesBufferContent`
 - `DeleteSelection_EmptySelection_ThrowsArgumentException`
 - `LoadDocument_FileNotFound_ReturnsFailureResult`
+
+### Test File Naming
+
+- One test file per source file, named identically — `PieceTable.cs` → `PieceTableTests.cs`.
+- All tests for a given source file live in that single corresponding test file; never split them across multiple files.
 
 ### Test Structure
 
@@ -283,6 +288,7 @@ Do not proceed until the user confirms.
 - Enable **nullable reference types** in every project (`<Nullable>enable</Nullable>`).
 - Enable **implicit usings** (`<ImplicitUsings>enable</ImplicitUsings>`).
 - Use **file-scoped namespaces** (`namespace TextEditor.Domain;` not block-scoped).
+- Use **`var`** for local variable declarations whenever the type is unambiguously inferable from the right-hand side; use explicit types only when the inferred type would be unclear to the reader.
 - Use **primary constructors** (C# 12+) for simple dependency injection.
 - Mark concrete classes `sealed` by default; remove `sealed` only when inheritance is intentional.
 

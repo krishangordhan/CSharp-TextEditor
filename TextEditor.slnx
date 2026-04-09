@@ -6,9 +6,9 @@
     <Project Path="src/TextEditor.Presentation/TextEditor.Presentation.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/TextEditor.Application.Tests/TextEditor.Application.Tests.csproj" />
-    <Project Path="tests/TextEditor.Domain.Tests/TextEditor.Domain.Tests.csproj" />
-    <Project Path="tests/TextEditor.Infrastructure.Tests/TextEditor.Infrastructure.Tests.csproj" />
-    <Project Path="tests/TextEditor.Presentation.Tests/TextEditor.Presentation.Tests.csproj" />
+    <Project Path="tests/TextEditor.Application.UnitTests/TextEditor.Application.UnitTests.csproj" />
+    <Project Path="tests/TextEditor.Domain.UnitTests/TextEditor.Domain.UnitTests.csproj" />
+    <Project Path="tests/TextEditor.Infrastructure.UnitTests/TextEditor.Infrastructure.UnitTests.csproj" />
+    <Project Path="tests/TextEditor.Presentation.UnitTests/TextEditor.Presentation.UnitTests.csproj" />
   </Folder>
 </Solution>
