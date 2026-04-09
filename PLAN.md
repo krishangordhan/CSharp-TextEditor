@@ -21,8 +21,8 @@ Build a fully-featured, cross-platform (Windows + macOS) desktop text editor in 
 
 ### Phase 1 — Piece Table Core (Domain)
 
-- [ ] **Step 5**: Create `BufferType` enum (`Original`, `Add`) and `Piece` value record (`BufferType`, `Start`, `Length`) in `TextEditor.Domain`.
-- [ ] **Step 6**: Create `PieceTable` class with an immutable original buffer string and a mutable add-buffer `StringBuilder`. Initialise the piece list from the original string.
+- [x] **Step 5**: Create `BufferType` enum (`Original`, `Add`) and `Piece` value record (`BufferType`, `Start`, `Length`) in `TextEditor.Domain`.
+- [x] **Step 6**: Create `PieceTable` class with an immutable original buffer string and a mutable add-buffer `StringBuilder`. Initialise the piece list from the original string.
 - [ ] **Step 7**: Implement `PieceTable.Insert(int offset, string text)` — appends text to the add-buffer, splits or extends pieces to reflect the insertion.
 - [ ] **Step 8**: Implement `PieceTable.Delete(int offset, int length)` — removes the character range by splitting and removing pieces.
 - [ ] **Step 9**: Implement `PieceTable.GetText()` and `PieceTable.GetRange(int offset, int length)` — materialise content by walking the piece list.
