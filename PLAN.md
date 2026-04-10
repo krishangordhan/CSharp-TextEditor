@@ -4,6 +4,13 @@
 
 ---
 
+## Testing Convention
+
+> **Tests are not a separate phase — they are part of every step.**
+> Whenever a step produces a new class or use case in Domain, Application, or Infrastructure, unit tests for that code must be written in the same step before the step is considered done. Treat the test cases noted in each step as the minimum bar; add further cases whenever edge cases are apparent.
+
+---
+
 ## Current Goal
 
 Build a fully-featured, cross-platform (Windows + macOS) desktop text editor in C# using Clean Architecture, with Avalonia UI as the presentation layer and a Piece Table as the core text storage structure.
@@ -25,153 +32,141 @@ Build a fully-featured, cross-platform (Windows + macOS) desktop text editor in 
 - [x] **Step 6**: Create `PieceTable` class with an immutable original buffer string and a mutable add-buffer `StringBuilder`. Initialise the piece list from the original string.
 - [x] **Step 7**: Implement `PieceTable.Insert(int offset, string text)` — appends text to the add-buffer, splits or extends pieces to reflect the insertion.
 - [x] **Step 8**: Implement `PieceTable.Delete(int offset, int length)` — removes the character range by splitting and removing pieces.
-- [ ] **Step 9**: Implement `PieceTable.GetText()` and `PieceTable.GetRange(int offset, int length)` — materialise content by walking the piece list.
-- [ ] **Step 10**: Write unit tests for `PieceTable` (insert at start/middle/end, delete, get full text, get range, multi-operation sequences).
+- [x] **Step 9**: Implement `PieceTable.GetText()` and `PieceTable.GetRange(int offset, int length)` — materialise content by walking the piece list.
+- [ ] **Step 10**: Write unit tests for `PieceTable` as a catch-up for Steps 5–9 (insert at start/middle/end, delete, get full text, get range, multi-operation sequences). _(One-off catch-up — subsequent steps include tests inline.)_
 
 ### Phase 2 — Line Model (Domain)
 
-- [ ] **Step 11**: Implement `PieceTable.LineCount` — counts newline characters in the logical text.
-- [ ] **Step 12**: Implement `PieceTable.GetLineText(int lineIndex)` — returns the text of a single logical line (excluding the newline character).
-- [ ] **Step 13**: Implement `PieceTable.GetLineStartOffset(int lineIndex)` and `PieceTable.GetLineEndOffset(int lineIndex)` — character offsets for line boundaries.
-- [ ] **Step 14**: Implement `PieceTable.OffsetToLineColumn(int offset)` → `(line, column)` and `PieceTable.LineColumnToOffset(int line, int column)` → `int offset` — bidirectional coordinate mapping.
-- [ ] **Step 15**: Write unit tests for all line model operations (single line, multiple lines, empty lines, last line without trailing newline, boundary offsets).
+- [ ] **Step 11**: Implement `PieceTable.LineCount` — counts newline characters in the logical text. Include tests: single-line document, multi-line document, empty string.
+- [ ] **Step 12**: Implement `PieceTable.GetLineText(int lineIndex)` — returns the text of a single logical line (excluding the newline character). Include tests: first line, last line, middle line, empty line.
+- [ ] **Step 13**: Implement `PieceTable.GetLineStartOffset(int lineIndex)` and `PieceTable.GetLineEndOffset(int lineIndex)` — character offsets for line boundaries. Include tests: boundary offsets for each line, last line without trailing newline.
+- [ ] **Step 14**: Implement `PieceTable.OffsetToLineColumn(int offset)` → `(line, column)` and `PieceTable.LineColumnToOffset(int line, int column)` → `int offset` — bidirectional coordinate mapping. Include tests: round-trip conversion, line start/end, document start/end boundaries.
 
 ### Phase 3 — Document Entity (Domain)
 
-- [ ] **Step 16**: Create `DocumentId` value record (wraps a `Guid`).
-- [ ] **Step 17**: Create `TextRange` value record (`int Offset`, `int Length`) with a `bool IsEmpty` property.
-- [ ] **Step 18**: Create `Document` entity class — wraps `PieceTable`, holds `DocumentId`, `FilePath?`, and an `IsDirty` flag. Exposes `InsertText`, `DeleteText`, `GetText`, `LineCount`, `GetLineText`, `OffsetToLineColumn`, `LineColumnToOffset`.
-- [ ] **Step 19**: Write unit tests for `Document` — verify dirty flag is set on mutation, cleared on construction, and that it delegates correctly to `PieceTable`.
+- [ ] **Step 15**: Create `DocumentId` value record (wraps a `Guid`).
+- [ ] **Step 16**: Create `TextRange` value record (`int Offset`, `int Length`) with a `bool IsEmpty` property. Include tests: `IsEmpty` true when length is zero, false otherwise.
+- [ ] **Step 17**: Create `Document` entity class — wraps `PieceTable`, holds `DocumentId`, `FilePath?`, and an `IsDirty` flag. Exposes `InsertText`, `DeleteText`, `GetText`, `LineCount`, `GetLineText`, `OffsetToLineColumn`, `LineColumnToOffset`. Include tests: dirty flag set on mutation, not set on construction, delegation to `PieceTable` produces correct text.
 
 ### Phase 4 — Application Layer: Interfaces & Shared Types
 
-- [ ] **Step 20**: Create `Result` and `Result<T>` types in `TextEditor.Application` — represent success/failure without exceptions; include `IsSuccess`, `Error` string, and factory methods `Ok()`, `Ok(value)`, `Fail(error)`.
-- [ ] **Step 21**: Write unit tests for `Result<T>` — success carries value, failure carries error message, accessing `.Value` on failure throws.
-- [ ] **Step 22**: Define `IDocumentRepository` interface in Application — `Task<Result<Document>> LoadAsync(string filePath, CancellationToken ct)` and `Task<Result> SaveAsync(Document document, string filePath, CancellationToken ct)`.
-- [ ] **Step 23**: Define `IClipboardService` interface in Application — `Task<string?> GetTextAsync(CancellationToken ct)` and `Task SetTextAsync(string text, CancellationToken ct)`.
+- [ ] **Step 18**: Create `Result` and `Result<T>` types in `TextEditor.Application` — represent success/failure without exceptions; include `IsSuccess`, `Error` string, and factory methods `Ok()`, `Ok(value)`, `Fail(error)`. Include tests: success carries value, failure carries error message, accessing `.Value` on a failure result throws.
+- [ ] **Step 19**: Define `IDocumentRepository` interface in Application — `Task<Result<Document>> LoadAsync(string filePath, CancellationToken ct)` and `Task<Result> SaveAsync(Document document, string filePath, CancellationToken ct)`.
+- [ ] **Step 20**: Define `IClipboardService` interface in Application — `Task<string?> GetTextAsync(CancellationToken ct)` and `Task SetTextAsync(string text, CancellationToken ct)`.
 
 ### Phase 5 — Application Use Cases: Document Lifecycle
 
-- [ ] **Step 24**: Implement `CreateNewDocumentUseCase` — returns a new `Document` with an empty `PieceTable` and a generated `DocumentId`.
-- [ ] **Step 25**: Implement `OpenDocumentUseCase` — calls `IDocumentRepository.LoadAsync`, returns `Result<Document>`.
-- [ ] **Step 26**: Implement `SaveDocumentUseCase` — calls `IDocumentRepository.SaveAsync` with the document's current path; returns `Result`.
-- [ ] **Step 27**: Implement `SaveDocumentAsUseCase` — same as save but accepts a new `filePath` parameter, updates `Document.FilePath`.
-- [ ] **Step 28**: Implement `CheckUnsavedChangesUseCase` — returns whether `Document.IsDirty` is true; used before close/open to decide whether to show a warning.
-- [ ] **Step 29**: Write unit tests for all document lifecycle use cases (mock `IDocumentRepository`; verify correct delegation, dirty-flag transitions, and failure propagation).
+- [ ] **Step 21**: Implement `CreateNewDocumentUseCase` — returns a new `Document` with an empty `PieceTable` and a generated `DocumentId`. Include tests: returned document has empty text, `IsDirty` is false.
+- [ ] **Step 22**: Implement `OpenDocumentUseCase` — calls `IDocumentRepository.LoadAsync`, returns `Result<Document>`. Include tests: mock repository success returns the document; mock repository failure propagates the error.
+- [ ] **Step 23**: Implement `SaveDocumentUseCase` — calls `IDocumentRepository.SaveAsync` with the document's current path; returns `Result`. Include tests: repository called with correct document and path, repository failure propagates.
+- [ ] **Step 24**: Implement `SaveDocumentAsUseCase` — same as save but accepts a new `filePath` parameter, updates `Document.FilePath`. Include tests: `Document.FilePath` updated to the new path, repository called with the new path.
+- [ ] **Step 25**: Implement `CheckUnsavedChangesUseCase` — returns whether `Document.IsDirty` is true; used before close/open to decide whether to show a warning. Include tests: returns `true` when dirty, `false` when clean.
 
 ### Phase 6 — Application Use Cases: Text Editing
 
-- [ ] **Step 30**: Implement `InsertTextUseCase` — validates offset is in range, calls `Document.InsertText`, returns `Result`.
-- [ ] **Step 31**: Implement `DeleteTextUseCase` — validates range is valid, calls `Document.DeleteText`, returns `Result`.
-- [ ] **Step 32**: Write unit tests for `InsertTextUseCase` and `DeleteTextUseCase` (valid input, offset out of range, zero-length delete).
+- [ ] **Step 26**: Implement `InsertTextUseCase` — validates offset is in range, calls `Document.InsertText`, returns `Result`. Include tests: valid offset updates document content, offset out of range returns failure result.
+- [ ] **Step 27**: Implement `DeleteTextUseCase` — validates range is valid, calls `Document.DeleteText`, returns `Result`. Include tests: valid range updates document content, invalid range returns failure result, zero-length delete returns failure result.
 
 ### Phase 7 — Infrastructure: File I/O
 
-- [ ] **Step 33**: Implement `FileDocumentRepository.LoadAsync` — reads file bytes, detects encoding via BOM sniffing (UTF-8 BOM, UTF-16 LE/BE BOM; default UTF-8 without BOM), decodes to string, constructs `Document`.
-- [ ] **Step 34**: Implement `FileDocumentRepository.SaveAsync` — writes document text to disk using the detected/original encoding; creates parent directories if absent.
-- [ ] **Step 35**: Create `InfrastructureServiceExtensions` — `IServiceCollection` extension method that registers `FileDocumentRepository` as `IDocumentRepository`.
-- [ ] **Step 36**: Write Infrastructure unit tests using an `InMemoryDocumentRepository` — no real file I/O; verify load returns correct `Document`, save stores content correctly.
+- [ ] **Step 28**: Implement `FileDocumentRepository.LoadAsync` — reads file bytes, detects encoding via BOM sniffing (UTF-8 BOM, UTF-16 LE/BE BOM; default UTF-8 without BOM), decodes to string, constructs `Document`. Include tests using `InMemoryDocumentRepository`: load returns a `Document` whose `GetText()` matches the stored content.
+- [ ] **Step 29**: Implement `FileDocumentRepository.SaveAsync` — writes document text to disk using the detected/original encoding; creates parent directories if absent. Include tests using `InMemoryDocumentRepository`: saved content matches `Document.GetText()`, encoding is preserved across a save-then-load round-trip.
+- [ ] **Step 30**: Create `InfrastructureServiceExtensions` — `IServiceCollection` extension method that registers `FileDocumentRepository` as `IDocumentRepository`.
 
 ### Phase 8 — Avalonia UI Scaffold
 
-- [ ] **Step 37**: Add Avalonia NuGet packages (`Avalonia`, `Avalonia.Desktop`, `Avalonia.Themes.Fluent`) to `TextEditor.Presentation`.
-- [ ] **Step 38**: Create `App.axaml` / `App.axaml.cs` — minimal Avalonia `Application` subclass with `FluentTheme`.
-- [ ] **Step 39**: Create `MainWindow.axaml` / `MainWindow.axaml.cs` — empty shell window with a `DockPanel` placeholder.
-- [ ] **Step 40**: Create `Program.cs` as the composition root — build `IServiceProvider`, register all services (Infrastructure + Application use cases), launch Avalonia app.
-- [ ] **Step 41**: Verify the app builds and opens a blank window on both target platforms (manual smoke test step).
+- [ ] **Step 31**: Add Avalonia NuGet packages (`Avalonia`, `Avalonia.Desktop`, `Avalonia.Themes.Fluent`) to `TextEditor.Presentation`.
+- [ ] **Step 32**: Create `App.axaml` / `App.axaml.cs` — minimal Avalonia `Application` subclass with `FluentTheme`.
+- [ ] **Step 33**: Create `MainWindow.axaml` / `MainWindow.axaml.cs` — empty shell window with a `DockPanel` placeholder.
+- [ ] **Step 34**: Create `Program.cs` as the composition root — build `IServiceProvider`, register all services (Infrastructure + Application use cases), launch Avalonia app.
+- [ ] **Step 35**: Verify the app builds and opens a blank window on both target platforms (manual smoke test step).
 
 ### Phase 9 — Word Wrap Engine (Application)
 
-- [ ] **Step 42**: Create `VisualLine` record in Application — `int LogicalLineIndex`, `int WrapOffsetInLine`, `string Text` (the visual segment).
-- [ ] **Step 43**: Create `WordWrapEngine` in Application — given a logical line's text and a `viewportCharacterWidth`, returns `IReadOnlyList<VisualLine>`. Implements VS Code–style soft wrap: break at the last word boundary (space) within the viewport width; if no boundary exists, break mid-word.
-- [ ] **Step 44**: Write unit tests for `WordWrapEngine` — line shorter than viewport (no wrap), line wraps at space, line wraps mid-word, empty line, line of exactly viewport width.
+- [ ] **Step 36**: Create `VisualLine` record in Application — `int LogicalLineIndex`, `int WrapOffsetInLine`, `string Text` (the visual segment).
+- [ ] **Step 37**: Create `WordWrapEngine` in Application — given a logical line's text and a `viewportCharacterWidth`, returns `IReadOnlyList<VisualLine>`. Implements VS Code–style soft wrap: break at the last word boundary (space) within the viewport width; if no boundary exists, break mid-word. Include tests: line shorter than viewport produces one visual line, line wraps at space boundary, line wraps mid-word when no space exists, empty line, line of exactly viewport width.
 
 ### Phase 10 — Custom Text Rendering Control (Presentation)
 
-- [ ] **Step 45**: Create `TextEditorControl` — a custom Avalonia `Control` subclass. Override `OnRender(DrawingContext)` to iterate visual lines and draw each using `FormattedText`. Use a fixed monospace font initially.
-- [ ] **Step 46**: Expose `Document` as a bindable property on `TextEditorControl`; invalidate the visual on change.
-- [ ] **Step 47**: Wire `TextEditorControl` into `MainWindow` and display a hardcoded document to verify text renders correctly.
+- [ ] **Step 38**: Create `TextEditorControl` — a custom Avalonia `Control` subclass. Override `OnRender(DrawingContext)` to iterate visual lines and draw each using `FormattedText`. Use a fixed monospace font initially.
+- [ ] **Step 39**: Expose `Document` as a bindable property on `TextEditorControl`; invalidate the visual on change.
+- [ ] **Step 40**: Wire `TextEditorControl` into `MainWindow` and display a hardcoded document to verify text renders correctly.
 
 ### Phase 11 — Cursor: Data Model (Domain)
 
-- [ ] **Step 48**: Create `CursorPosition` value record (`int Line`, `int Column`, `int PreferredColumn`) — `PreferredColumn` stores the intended column for VS Code–style column memory.
-- [ ] **Step 49**: Create `TextCursor` class — holds `CursorPosition`, references `Document`. Implement `MoveLeft()` and `MoveRight()` with line-boundary wrapping (moving left at column 0 goes to end of previous line; moving right at line end goes to start of next line).
-- [ ] **Step 50**: Implement `TextCursor.MoveUp()` and `MoveDown()` — navigates to the adjacent logical line, restoring `PreferredColumn` if the target line is long enough (VS Code column memory behaviour).
-- [ ] **Step 51**: Write unit tests for `TextCursor` — left/right wrap at line boundaries, up/down column memory (preferred column preserved across short line, restored on long line), movement clamped at document start/end.
+- [ ] **Step 41**: Create `CursorPosition` value record (`int Line`, `int Column`, `int PreferredColumn`) — `PreferredColumn` stores the intended column for VS Code–style column memory.
+- [ ] **Step 42**: Create `TextCursor` class — holds `CursorPosition`, references `Document`. Implement `MoveLeft()` and `MoveRight()` with line-boundary wrapping (moving left at column 0 goes to end of previous line; moving right at line end goes to start of next line). Include tests: left wrap at column 0, right wrap at line end, movement clamped at document start and end.
+- [ ] **Step 43**: Implement `TextCursor.MoveUp()` and `MoveDown()` — navigates to the adjacent logical line, restoring `PreferredColumn` if the target line is long enough (VS Code column memory behaviour). Include tests: column memory preserved when moving through a shorter line, column restored on a sufficiently long line, movement clamped at document start and end.
 
 ### Phase 12 — Cursor: Rendering & Keyboard Input (Presentation)
 
-- [ ] **Step 52**: Render a blinking caret (1 px wide, line-height tall) at the `TextCursor` position inside `TextEditorControl.OnRender`.
-- [ ] **Step 53**: Implement a blink timer in `TextEditorControl` — toggles caret visibility every 500 ms using `DispatcherTimer`; resets on any keystroke.
-- [ ] **Step 54**: Handle `KeyDown` in `TextEditorControl` — route `Left`, `Right`, `Up`, `Down` arrows to `TextCursor`; call `InvalidateVisual()` after each move.
+- [ ] **Step 44**: Render a blinking caret (1 px wide, line-height tall) at the `TextCursor` position inside `TextEditorControl.OnRender`.
+- [ ] **Step 45**: Implement a blink timer in `TextEditorControl` — toggles caret visibility every 500 ms using `DispatcherTimer`; resets on any keystroke.
+- [ ] **Step 46**: Handle `KeyDown` in `TextEditorControl` — route `Left`, `Right`, `Up`, `Down` arrows to `TextCursor`; call `InvalidateVisual()` after each move.
 
 ### Phase 13 — Keyboard Text Input (Presentation)
 
-- [ ] **Step 55**: Handle printable character `TextInput` event → call `InsertTextUseCase` at cursor offset; advance cursor by the inserted text length.
-- [ ] **Step 56**: Handle `Backspace` → delete the character before the cursor (if cursor is not at document start); move cursor left.
-- [ ] **Step 57**: Handle `Delete` → delete the character after the cursor (if cursor is not at document end); cursor position unchanged.
-- [ ] **Step 58**: Handle `Enter` → insert `\n` at the cursor offset; move cursor to the start of the new line.
+- [ ] **Step 47**: Handle printable character `TextInput` event → call `InsertTextUseCase` at cursor offset; advance cursor by the inserted text length.
+- [ ] **Step 48**: Handle `Backspace` → delete the character before the cursor (if cursor is not at document start); move cursor left.
+- [ ] **Step 49**: Handle `Delete` → delete the character after the cursor (if cursor is not at document end); cursor position unchanged.
+- [ ] **Step 50**: Handle `Enter` → insert `\n` at the cursor offset; move cursor to the start of the new line.
 
 ### Phase 14 — Scrolling (Presentation)
 
-- [ ] **Step 59**: Implement `TextEditorControl.MeasureOverride` — calculate and return total content size (height = total visual line count × line height; width = longest visual line in pixels) so the parent scroll container knows the scroll extent.
-- [ ] **Step 60**: Wrap `TextEditorControl` in an Avalonia `ScrollViewer` in `MainWindow` — enable vertical and horizontal scrolling.
-- [ ] **Step 61**: Implement auto-scroll in `TextEditorControl` — after every cursor move, if the caret falls outside the current viewport bounds, scroll the minimum amount to bring it into view.
+- [ ] **Step 51**: Implement `TextEditorControl.MeasureOverride` — calculate and return total content size (height = total visual line count × line height; width = longest visual line in pixels) so the parent scroll container knows the scroll extent.
+- [ ] **Step 52**: Wrap `TextEditorControl` in an Avalonia `ScrollViewer` in `MainWindow` — enable vertical and horizontal scrolling.
+- [ ] **Step 53**: Implement auto-scroll in `TextEditorControl` — after every cursor move, if the caret falls outside the current viewport bounds, scroll the minimum amount to bring it into view.
 
 ### Phase 15 — File Operations UI (Presentation)
 
-- [ ] **Step 62**: Add a `MenuBar` to `MainWindow` with `File` menu items: `New` (Ctrl+N), `Open…` (Ctrl+O), `Save` (Ctrl+S), `Save As…` (Ctrl+Shift+S), `Exit`.
-- [ ] **Step 63**: Wire `Open…` — show Avalonia `OpenFileDialog`, call `OpenDocumentUseCase`, load the result into `TextEditorControl`.
-- [ ] **Step 64**: Wire `Save` (Ctrl+S) — call `SaveDocumentUseCase`; if the document has no file path yet, fall through to `SaveDocumentAsUseCase`.
-- [ ] **Step 65**: Wire `Save As…` — show Avalonia `SaveFileDialog`, call `SaveDocumentAsUseCase`.
-- [ ] **Step 66**: Implement unsaved-changes warning dialog — a modal with `Save`, `Don't Save`, and `Cancel` buttons. Show it before `New`, `Open`, and `Exit` when `CheckUnsavedChangesUseCase` returns true.
+- [ ] **Step 54**: Add a `MenuBar` to `MainWindow` with `File` menu items: `New` (Ctrl+N), `Open…` (Ctrl+O), `Save` (Ctrl+S), `Save As…` (Ctrl+Shift+S), `Exit`.
+- [ ] **Step 55**: Wire `Open…` — show Avalonia `OpenFileDialog`, call `OpenDocumentUseCase`, load the result into `TextEditorControl`.
+- [ ] **Step 56**: Wire `Save` (Ctrl+S) — call `SaveDocumentUseCase`; if the document has no file path yet, fall through to `SaveDocumentAsUseCase`.
+- [ ] **Step 57**: Wire `Save As…` — show Avalonia `SaveFileDialog`, call `SaveDocumentAsUseCase`.
+- [ ] **Step 58**: Implement unsaved-changes warning dialog — a modal with `Save`, `Don't Save`, and `Cancel` buttons. Show it before `New`, `Open`, and `Exit` when `CheckUnsavedChangesUseCase` returns true.
 
 ### Phase 16 — Status Bar (Presentation)
 
-- [ ] **Step 67**: Create `StatusBarControl` — a thin `DockPanel` at the bottom of `MainWindow` showing: document filename (or `Untitled`), dirty indicator (`●`), cursor line + column, and file encoding.
-- [ ] **Step 68**: Bind `StatusBarControl` to a `StatusBarViewModel` that updates reactively when the document or cursor changes.
+- [ ] **Step 59**: Create `StatusBarControl` — a thin `DockPanel` at the bottom of `MainWindow` showing: document filename (or `Untitled`), dirty indicator (`●`), cursor line + column, and file encoding.
+- [ ] **Step 60**: Bind `StatusBarControl` to a `StatusBarViewModel` that updates reactively when the document or cursor changes.
 
 ### Phase 17 — Undo / Redo: Command Pattern (Application)
 
-- [ ] **Step 69**: Define `IEditorCommand` interface in Application — `void Execute()` and `void Undo()`.
-- [ ] **Step 70**: Implement `InsertTextCommand : IEditorCommand` — stores document, offset, and text; `Execute` calls `Document.InsertText`; `Undo` calls `Document.DeleteText`.
-- [ ] **Step 71**: Implement `DeleteTextCommand : IEditorCommand` — stores document, offset, length, and the deleted text (captured at execute time for undo); `Execute` calls `Document.DeleteText`; `Undo` calls `Document.InsertText`.
-- [ ] **Step 72**: Implement `CommandHistory` — maintains an undo stack and a redo stack. `Execute(IEditorCommand)` runs the command, pushes to undo, clears redo. `Undo()` pops from undo, calls `command.Undo()`, pushes to redo. `Redo()` pops from redo, calls `command.Execute()`, pushes to undo.
-- [ ] **Step 73**: Refactor `InsertTextUseCase` and `DeleteTextUseCase` to create the corresponding `IEditorCommand` and route through `CommandHistory` instead of calling `Document` directly.
-- [ ] **Step 74**: Wire Ctrl+Z → `CommandHistory.Undo()` and Ctrl+Y / Ctrl+Shift+Z → `CommandHistory.Redo()` in `MainWindow`.
-- [ ] **Step 75**: Write unit tests for `CommandHistory` — execute, undo, redo, undo after new command clears the redo stack, undo/redo with an empty stack are no-ops.
+- [ ] **Step 61**: Define `IEditorCommand` interface in Application — `void Execute()` and `void Undo()`.
+- [ ] **Step 62**: Implement `InsertTextCommand : IEditorCommand` — stores document, offset, and text; `Execute` calls `Document.InsertText`; `Undo` calls `Document.DeleteText`. Include tests: `Execute` inserts text at the correct offset, `Undo` restores the original content.
+- [ ] **Step 63**: Implement `DeleteTextCommand : IEditorCommand` — stores document, offset, length, and the deleted text (captured at execute time for undo); `Execute` calls `Document.DeleteText`; `Undo` calls `Document.InsertText`. Include tests: `Execute` removes the correct range, `Undo` restores the deleted text at the original offset.
+- [ ] **Step 64**: Implement `CommandHistory` — maintains an undo stack and a redo stack. `Execute(IEditorCommand)` runs the command, pushes to undo, clears redo. `Undo()` pops from undo, calls `command.Undo()`, pushes to redo. `Redo()` pops from redo, calls `command.Execute()`, pushes to undo. Include tests: execute/undo/redo cycle, executing a new command after undo clears the redo stack, undo on an empty stack is a no-op, redo on an empty stack is a no-op.
+- [ ] **Step 65**: Refactor `InsertTextUseCase` and `DeleteTextUseCase` to create the corresponding `IEditorCommand` and route through `CommandHistory` instead of calling `Document` directly. Verify existing use-case tests still pass after refactor.
+- [ ] **Step 66**: Wire Ctrl+Z → `CommandHistory.Undo()` and Ctrl+Y / Ctrl+Shift+Z → `CommandHistory.Redo()` in `MainWindow`.
 
 ### Phase 18 — Text Selection (Domain + Application + Presentation)
 
-- [ ] **Step 76**: Create `TextSelection` value record in Domain — `int AnchorOffset`, `int ActiveOffset`; computed property `NormalisedRange` returns a `TextRange` (low-to-high); `bool IsEmpty` when both offsets are equal.
-- [ ] **Step 77**: Add selection state to `TextCursor`. On the first Shift+Arrow, set anchor at the current offset; extend active on subsequent Shift+Arrow presses. Any unshifted move collapses the selection.
-- [ ] **Step 78**: Implement `TextCursor.SelectAll(Document)` — sets anchor to 0 and active to document length.
-- [ ] **Step 79**: Render selection highlight in `TextEditorControl.OnRender` — draw a semi-transparent rectangle behind the selected characters on each visual line that intersects the selection range.
-- [ ] **Step 80**: Update keyboard input handlers — if a selection is active when `Backspace`, `Delete`, or a printable key is pressed, delete the selected range first (typed character replaces the selection).
-- [ ] **Step 81**: Wire Ctrl+A → `TextCursor.SelectAll`.
-- [ ] **Step 82**: Write unit tests for `TextSelection` — empty selection, normalised range when anchor > active, `IsEmpty`, extending selection across line boundaries.
+- [ ] **Step 67**: Create `TextSelection` value record in Domain — `int AnchorOffset`, `int ActiveOffset`; computed property `NormalisedRange` returns a `TextRange` (low-to-high); `bool IsEmpty` when both offsets are equal. Include tests: `IsEmpty` true when anchor equals active, `NormalisedRange` correct when anchor > active and when anchor < active.
+- [ ] **Step 68**: Add selection state to `TextCursor`. On the first Shift+Arrow, set anchor at the current offset; extend active on subsequent Shift+Arrow presses. Any unshifted move collapses the selection. Include tests: Shift+Arrow extends the selection, a subsequent unshifted Arrow collapses it, selection extends correctly across line boundaries.
+- [ ] **Step 69**: Implement `TextCursor.SelectAll(Document)` — sets anchor to 0 and active to document length. Include tests: anchor is 0 and active equals total document length.
+- [ ] **Step 70**: Render selection highlight in `TextEditorControl.OnRender` — draw a semi-transparent rectangle behind the selected characters on each visual line that intersects the selection range.
+- [ ] **Step 71**: Update keyboard input handlers — if a selection is active when `Backspace`, `Delete`, or a printable key is pressed, delete the selected range first (typed character replaces the selection).
+- [ ] **Step 72**: Wire Ctrl+A → `TextCursor.SelectAll`.
 
 ### Phase 19 — Copy / Paste (Application + Presentation)
 
-- [ ] **Step 83**: Implement `CopySelectionUseCase` — reads `TextSelection.NormalisedRange` from the cursor, calls `Document.GetRange`, calls `IClipboardService.SetTextAsync`.
-- [ ] **Step 84**: Implement `CutSelectionUseCase` — copies selection to clipboard, then deletes it via `DeleteTextCommand` through `CommandHistory`.
-- [ ] **Step 85**: Implement `PasteTextUseCase` — calls `IClipboardService.GetTextAsync`; if text is non-empty, deletes any active selection, then inserts the text at the cursor offset via `InsertTextCommand`.
-- [ ] **Step 86**: Implement `AvaloniaClipboardService : IClipboardService` in Presentation — delegates to `TopLevel.GetTopLevel(control)!.Clipboard`.
-- [ ] **Step 87**: Register `AvaloniaClipboardService` in the composition root. Wire Ctrl+C, Ctrl+X, Ctrl+V in `MainWindow`.
-- [ ] **Step 88**: Write unit tests for `CopySelectionUseCase`, `CutSelectionUseCase`, and `PasteTextUseCase` — mock `IClipboardService`; use `It.Is<T>` to verify the exact text written to and read from the clipboard.
+- [ ] **Step 73**: Implement `CopySelectionUseCase` — reads `TextSelection.NormalisedRange` from the cursor, calls `Document.GetRange`, calls `IClipboardService.SetTextAsync`. Include tests: mock `IClipboardService`; use `It.Is<T>` to verify the exact selected text is passed to `SetTextAsync`.
+- [ ] **Step 74**: Implement `CutSelectionUseCase` — copies selection to clipboard, then deletes it via `DeleteTextCommand` through `CommandHistory`. Include tests: clipboard contains the selection text, the selection range is removed from the document.
+- [ ] **Step 75**: Implement `PasteTextUseCase` — calls `IClipboardService.GetTextAsync`; if text is non-empty, deletes any active selection, then inserts the text at the cursor offset via `InsertTextCommand`. Include tests: mock `IClipboardService` returns text; text is inserted at the cursor position, active selection is replaced before insertion.
+- [ ] **Step 76**: Implement `AvaloniaClipboardService : IClipboardService` in Presentation — delegates to `TopLevel.GetTopLevel(control)!.Clipboard`.
+- [ ] **Step 77**: Register `AvaloniaClipboardService` in the composition root. Wire Ctrl+C, Ctrl+X, Ctrl+V in `MainWindow`.
 
 ### Phase 20 — Line Number Gutter (Presentation)
 
-- [ ] **Step 89**: Create `LineNumberGutterControl` — a custom Avalonia `Control` that renders right-aligned line numbers in a fixed-width column using the same line height as `TextEditorControl`.
-- [ ] **Step 90**: Lay out `LineNumberGutterControl` and `TextEditorControl` side-by-side inside a `Grid` within the `ScrollViewer`, ensuring the gutter scrolls vertically in sync with the editor but remains fixed horizontally.
-- [ ] **Step 91**: Highlight the current line number (bold or accent colour) to match the cursor's current logical line.
+- [ ] **Step 78**: Create `LineNumberGutterControl` — a custom Avalonia `Control` that renders right-aligned line numbers in a fixed-width column using the same line height as `TextEditorControl`.
+- [ ] **Step 79**: Lay out `LineNumberGutterControl` and `TextEditorControl` side-by-side inside a `Grid` within the `ScrollViewer`, ensuring the gutter scrolls vertically in sync with the editor but remains fixed horizontally.
+- [ ] **Step 80**: Highlight the current line number (bold or accent colour) to match the cursor's current logical line.
 
 ### Phase 21 — Auto-Indent (Application + Presentation)
 
-- [ ] **Step 92**: Define `IIndentationStrategy` interface in Application — `string GetIndentForNewLine(string currentLineText)`.
-- [ ] **Step 93**: Implement `CopyPreviousLineIndentStrategy : IIndentationStrategy` — extracts the leading whitespace (spaces or tabs) from `currentLineText` and returns it as the indent prefix for the new line.
-- [ ] **Step 94**: Update the `Enter` key handler in `TextEditorControl` — after inserting `\n`, call `IIndentationStrategy.GetIndentForNewLine` with the current line's text and insert the returned indent string; position the cursor after the indent.
-- [ ] **Step 95**: Write unit tests for `CopyPreviousLineIndentStrategy` — no indent (plain text line), spaces only, tabs only, mixed leading whitespace, empty line.
+- [ ] **Step 81**: Define `IIndentationStrategy` interface in Application — `string GetIndentForNewLine(string currentLineText)`.
+- [ ] **Step 82**: Implement `CopyPreviousLineIndentStrategy : IIndentationStrategy` — extracts the leading whitespace (spaces or tabs) from `currentLineText` and returns it as the indent prefix for the new line. Include tests: no indent (plain text line), spaces only, tabs only, mixed leading whitespace, empty line.
+- [ ] **Step 83**: Update the `Enter` key handler in `TextEditorControl` — after inserting `\n`, call `IIndentationStrategy.GetIndentForNewLine` with the current line's text and insert the returned indent string; position the cursor after the indent.
 
 ---
 

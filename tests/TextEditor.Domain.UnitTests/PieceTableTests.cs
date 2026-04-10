@@ -163,5 +163,128 @@ public sealed class PieceTableTests
         // Assert
         act.ShouldThrow<ArgumentOutOfRangeException>();
     }
+
+    [Fact]
+    public void GetText_EmptyDocument_ReturnsEmptyString()
+    {
+        // Arrange
+        var pieceTable = new PieceTable(string.Empty);
+
+        // Act
+        var result = pieceTable.GetText();
+
+        // Assert
+        result.ShouldBe(string.Empty);
+    }
+
+    [Fact]
+    public void GetText_OriginalTextOnly_ReturnsOriginalText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello World");
+
+        // Act
+        var result = pieceTable.GetText();
+
+        // Assert
+        result.ShouldBe("Hello World");
+    }
+
+    [Fact]
+    public void GetText_AfterInsertAtMiddle_ReturnsCorrectText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Helo");
+
+        // Act
+        pieceTable.Insert(3, "l");
+        var result = pieceTable.GetText();
+
+        // Assert
+        result.ShouldBe("Hello");
+    }
+
+    [Fact]
+    public void GetText_AfterDeleteFromMiddle_ReturnsCorrectText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        pieceTable.Delete(1, 3);
+        var result = pieceTable.GetText();
+
+        // Assert
+        result.ShouldBe("Ho");
+    }
+
+    [Fact]
+    public void GetText_AfterMultipleOperations_ReturnsCorrectText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello World");
+
+        // Act
+        pieceTable.Delete(5, 6);
+        pieceTable.Insert(5, " Everyone");
+        var result = pieceTable.GetText();
+
+        // Assert
+        result.ShouldBe("Hello Everyone");
+    }
+
+    [Fact]
+    public void GetRange_ZeroLength_ReturnsEmptyString()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello World");
+
+        // Act
+        var result = pieceTable.GetRange(0, 0);
+
+        // Assert
+        result.ShouldBe(string.Empty);
+    }
+
+
+    [Fact]
+    public void GetRange_AcrossPieceBoundary_ReturnsCorrectSubstring()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+        pieceTable.Insert(5, " World");
+
+        // Act
+        var result = pieceTable.GetRange(3, 5);
+
+        // Assert
+        result.ShouldBe("lo Wo");
+    }
+
+    [Fact]
+    public void GetRange_NegativeOffset_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        var act = () => pieceTable.GetRange(-1, 1);
+
+        // Assert
+        act.ShouldThrow<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void GetRange_RangeExceedsDocumentLength_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        var act = () => pieceTable.GetRange(3, 5);
+
+        // Assert
+        act.ShouldThrow<ArgumentOutOfRangeException>();
+    }
 }
 
