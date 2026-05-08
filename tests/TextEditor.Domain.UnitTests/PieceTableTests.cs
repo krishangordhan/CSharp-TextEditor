@@ -422,5 +422,85 @@ public sealed class PieceTableTests
         // Assert
         pieceTable.GetText().ShouldBe("Hello");
     }
+
+    [Fact]
+    public void LineCount_EmptyDocument_ReturnsOne()
+    {
+        // Arrange
+        var pieceTable = new PieceTable(string.Empty);
+
+        // Act
+        var result = pieceTable.LineCount;
+
+        // Assert
+        result.ShouldBe(1);
+    }
+
+    [Fact]
+    public void LineCount_SingleLineDocument_ReturnsOne()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello World");
+
+        // Act
+        var result = pieceTable.LineCount;
+
+        // Assert
+        result.ShouldBe(1);
+    }
+
+    [Fact]
+    public void LineCount_MultiLineDocument_ReturnsCorrectCount()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Line1\nLine2\nLine3");
+
+        // Act
+        var result = pieceTable.LineCount;
+
+        // Assert
+        result.ShouldBe(3);
+    }
+
+    [Fact]
+    public void LineCount_TrailingNewline_CountsExtraEmptyLine()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Line1\nLine2\n");
+
+        // Act
+        var result = pieceTable.LineCount;
+
+        // Assert
+        result.ShouldBe(3);
+    }
+
+    [Fact]
+    public void LineCount_AfterInsertingNewline_IncrementsCount()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("HelloWorld");
+
+        // Act
+        pieceTable.Insert(5, "\n");
+        var result = pieceTable.LineCount;
+
+        // Assert
+        result.ShouldBe(2);
+    }
+
+    [Fact]
+    public void LineCount_AfterDeletingNewline_DecrementsCount()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello\nWorld");
+
+        // Act
+        pieceTable.Delete(5, 1);
+        var result = pieceTable.LineCount;
+
+        // Assert
+        result.ShouldBe(1);
+    }
 }
 
