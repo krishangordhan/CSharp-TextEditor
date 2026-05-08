@@ -286,5 +286,141 @@ public sealed class PieceTableTests
         // Assert
         act.ShouldThrow<ArgumentOutOfRangeException>();
     }
+
+    [Fact]
+    public void Insert_AtStart_ProducesCorrectText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("World");
+
+        // Act
+        pieceTable.Insert(0, "Hello ");
+
+        // Assert
+        pieceTable.GetText().ShouldBe("Hello World");
+    }
+
+    [Fact]
+    public void Insert_AtEnd_ProducesCorrectText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        pieceTable.Insert(5, " World");
+
+        // Assert
+        pieceTable.GetText().ShouldBe("Hello World");
+    }
+
+    [Fact]
+    public void Insert_IntoEmptyDocument_ProducesCorrectText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable(string.Empty);
+
+        // Act
+        pieceTable.Insert(0, "Hello");
+
+        // Assert
+        pieceTable.GetText().ShouldBe("Hello");
+    }
+
+    [Fact]
+    public void GetRange_WithinOriginalBuffer_ReturnsCorrectSubstring()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello World");
+
+        // Act
+        var result = pieceTable.GetRange(6, 5);
+
+        // Assert
+        result.ShouldBe("World");
+    }
+
+    [Fact]
+    public void GetText_AfterInsertAtStart_ReturnsCorrectText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("World");
+
+        // Act
+        pieceTable.Insert(0, "Hello ");
+        var result = pieceTable.GetText();
+
+        // Assert
+        result.ShouldBe("Hello World");
+    }
+
+    [Fact]
+    public void GetText_AfterInsertAtEnd_ReturnsCorrectText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        pieceTable.Insert(5, " World");
+        var result = pieceTable.GetText();
+
+        // Assert
+        result.ShouldBe("Hello World");
+    }
+
+    [Fact]
+    public void GetText_AfterSequentialInsertsAndDelete_ReturnsCorrectText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable(string.Empty);
+
+        // Act
+        pieceTable.Insert(0, "Hello");
+        pieceTable.Insert(5, " World");
+        pieceTable.Delete(5, 6);
+        pieceTable.Insert(5, " Everyone");
+        var result = pieceTable.GetText();
+
+        // Assert
+        result.ShouldBe("Hello Everyone");
+    }
+
+    [Fact]
+    public void Delete_EntireDocument_ProducesEmptyText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        pieceTable.Delete(0, 5);
+
+        // Assert
+        pieceTable.GetText().ShouldBe(string.Empty);
+    }
+
+    [Fact]
+    public void Delete_AtStart_ProducesCorrectText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello World");
+
+        // Act
+        pieceTable.Delete(0, 6);
+
+        // Assert
+        pieceTable.GetText().ShouldBe("World");
+    }
+
+    [Fact]
+    public void Delete_AtEnd_ProducesCorrectText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello World");
+
+        // Act
+        pieceTable.Delete(5, 6);
+
+        // Assert
+        pieceTable.GetText().ShouldBe("Hello");
+    }
 }
 

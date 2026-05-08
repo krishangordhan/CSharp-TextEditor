@@ -33,7 +33,7 @@ Build a fully-featured, cross-platform (Windows + macOS) desktop text editor in 
 - [x] **Step 7**: Implement `PieceTable.Insert(int offset, string text)` — appends text to the add-buffer, splits or extends pieces to reflect the insertion.
 - [x] **Step 8**: Implement `PieceTable.Delete(int offset, int length)` — removes the character range by splitting and removing pieces.
 - [x] **Step 9**: Implement `PieceTable.GetText()` and `PieceTable.GetRange(int offset, int length)` — materialise content by walking the piece list.
-- [ ] **Step 10**: Write unit tests for `PieceTable` as a catch-up for Steps 5–9 (insert at start/middle/end, delete, get full text, get range, multi-operation sequences). _(One-off catch-up — subsequent steps include tests inline.)_
+- [x] **Step 10**: Write unit tests for `PieceTable` as a catch-up for Steps 5–9 (insert at start/middle/end, delete, get full text, get range, multi-operation sequences). _(One-off catch-up — subsequent steps include tests inline.)_
 
 ### Phase 2 — Line Model (Domain)
 
