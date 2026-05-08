@@ -18,6 +18,23 @@ internal sealed class PieceTable
 
     internal int Length => _pieces.Sum(p => p.Length);
 
+    internal int LineCount => CountNewlines() + 1;
+
+    private int CountNewlines()
+    {
+        var count = 0;
+        foreach (var piece in _pieces)
+        {
+            var buffer = piece.Buffer == BufferType.Original ? _originalBuffer : _addBuffer.ToString();
+            for (var i = piece.Start; i < piece.Start + piece.Length; i++)
+            {
+                if (buffer[i] == '\n')
+                    count++;
+            }
+        }
+        return count;
+    }
+
     internal void Insert(int offset, string text)
     {
         ArgumentNullException.ThrowIfNull(text);
