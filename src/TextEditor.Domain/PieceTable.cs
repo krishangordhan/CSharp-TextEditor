@@ -20,12 +20,47 @@ internal sealed class PieceTable
 
     internal int LineCount => CountNewlines() + 1;
 
+    internal string GetLineText(int lineIndex)
+    {
+        if (lineIndex < 0 || lineIndex >= LineCount)
+            throw new ArgumentOutOfRangeException(nameof(lineIndex), "Line index must be within [0, LineCount).");
+
+        var addBufferSnapshot = _addBuffer.ToString();
+        var currentLine = 0;
+        var inTargetLine = lineIndex == 0;
+        var sb = new StringBuilder();
+
+        foreach (var piece in _pieces)
+        {
+            var buffer = piece.Buffer == BufferType.Original ? _originalBuffer : addBufferSnapshot;
+            for (var i = piece.Start; i < piece.Start + piece.Length; i++)
+            {
+                var ch = buffer[i];
+                if (ch == '\n')
+                {
+                    if (inTargetLine)
+                        return sb.ToString();
+                    currentLine++;
+                    if (currentLine == lineIndex)
+                        inTargetLine = true;
+                }
+                else if (inTargetLine)
+                {
+                    sb.Append(ch);
+                }
+            }
+        }
+
+        return sb.ToString();
+    }
+
     private int CountNewlines()
     {
+        var addBufferSnapshot = _addBuffer.ToString();
         var count = 0;
         foreach (var piece in _pieces)
         {
-            var buffer = piece.Buffer == BufferType.Original ? _originalBuffer : _addBuffer.ToString();
+            var buffer = piece.Buffer == BufferType.Original ? _originalBuffer : addBufferSnapshot;
             for (var i = piece.Start; i < piece.Start + piece.Length; i++)
             {
                 if (buffer[i] == '\n')
