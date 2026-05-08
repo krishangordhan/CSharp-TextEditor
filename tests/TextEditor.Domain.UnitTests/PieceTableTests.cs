@@ -502,5 +502,136 @@ public sealed class PieceTableTests
         // Assert
         result.ShouldBe(1);
     }
+
+    [Fact]
+    public void GetLineText_SingleLineDocument_ReturnsFullText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        var result = pieceTable.GetLineText(0);
+
+        // Assert
+        result.ShouldBe("Hello");
+    }
+
+    [Fact]
+    public void GetLineText_FirstLine_ReturnsTextBeforeNewline()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Line1\nLine2");
+
+        // Act
+        var result = pieceTable.GetLineText(0);
+
+        // Assert
+        result.ShouldBe("Line1");
+    }
+
+    [Fact]
+    public void GetLineText_LastLine_ReturnsTextAfterFinalNewline()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Line1\nLine2");
+
+        // Act
+        var result = pieceTable.GetLineText(1);
+
+        // Assert
+        result.ShouldBe("Line2");
+    }
+
+    [Fact]
+    public void GetLineText_MiddleLine_ReturnsCorrectSegment()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Line1\nLine2\nLine3");
+
+        // Act
+        var result = pieceTable.GetLineText(1);
+
+        // Assert
+        result.ShouldBe("Line2");
+    }
+
+    [Fact]
+    public void GetLineText_EmptyLine_ReturnsEmptyString()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Line1\n\nLine3");
+
+        // Act
+        var result = pieceTable.GetLineText(1);
+
+        // Assert
+        result.ShouldBe(string.Empty);
+    }
+
+    [Fact]
+    public void GetLineText_TrailingNewlineLastLine_ReturnsEmptyString()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Line1\n");
+
+        // Act
+        var result = pieceTable.GetLineText(1);
+
+        // Assert
+        result.ShouldBe(string.Empty);
+    }
+
+    [Fact]
+    public void GetLineText_EmptyDocument_ReturnsEmptyString()
+    {
+        // Arrange
+        var pieceTable = new PieceTable(string.Empty);
+
+        // Act
+        var result = pieceTable.GetLineText(0);
+
+        // Assert
+        result.ShouldBe(string.Empty);
+    }
+
+    [Fact]
+    public void GetLineText_NegativeIndex_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+
+        // Act
+        var act = () => pieceTable.GetLineText(-1);
+
+        // Assert
+        act.ShouldThrow<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void GetLineText_IndexEqualToLineCount_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello\nWorld");
+
+        // Act
+        var act = () => pieceTable.GetLineText(2);
+
+        // Assert
+        act.ShouldThrow<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void GetLineText_LineSpanningMultiplePieces_ReturnsCorrectText()
+    {
+        // Arrange
+        var pieceTable = new PieceTable("Hello");
+        pieceTable.Insert(5, "\nWorld");
+
+        // Act
+        var result = pieceTable.GetLineText(1);
+
+        // Assert
+        result.ShouldBe("World");
+    }
 }
 

@@ -38,7 +38,7 @@ Build a fully-featured, cross-platform (Windows + macOS) desktop text editor in 
 ### Phase 2 — Line Model (Domain)
 
 - [x] **Step 11**: Implement `PieceTable.LineCount` — counts newline characters in the logical text. Include tests: single-line document, multi-line document, empty string.
-- [ ] **Step 12**: Implement `PieceTable.GetLineText(int lineIndex)` — returns the text of a single logical line (excluding the newline character). Include tests: first line, last line, middle line, empty line.
+- [x] **Step 12**: Implement `PieceTable.GetLineText(int lineIndex)` — returns the text of a single logical line (excluding the newline character). Include tests: first line, last line, middle line, empty line.
 - [ ] **Step 13**: Implement `PieceTable.GetLineStartOffset(int lineIndex)` and `PieceTable.GetLineEndOffset(int lineIndex)` — character offsets for line boundaries. Include tests: boundary offsets for each line, last line without trailing newline.
 - [ ] **Step 14**: Implement `PieceTable.OffsetToLineColumn(int offset)` → `(line, column)` and `PieceTable.LineColumnToOffset(int line, int column)` → `int offset` — bidirectional coordinate mapping. Include tests: round-trip conversion, line start/end, document start/end boundaries.
 
